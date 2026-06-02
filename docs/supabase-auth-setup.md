@@ -75,3 +75,32 @@ for select
 to authenticated
 using (status = 'ativa');
 ```
+
+## Paroquia inicial para teste
+
+Para testar o fluxo do app, cadastre pelo menos uma paroquia ativa. Exemplo:
+
+```sql
+insert into public.paroquias (nome, cidade, codigo_acesso, status)
+values ('Paroquia Demo', 'Sao Paulo', 'FE2026', 'ativa')
+on conflict (codigo_acesso) do update
+set
+  nome = excluded.nome,
+  cidade = excluded.cidade,
+  status = excluded.status;
+```
+
+Depois disso, o aluno pode criar conta, fazer login e informar o codigo `FE2026`.
+
+## Confirmacao de e-mail em app mobile
+
+Se a confirmacao de e-mail estiver ligada no Supabase, o aluno recebe um e-mail com um link de confirmacao. Depois de confirmar, o Supabase redireciona para a URL configurada em **Authentication > URL Configuration**.
+
+Se essa URL estiver como `http://localhost:3000`, o celular vai mostrar erro de conexao recusada. Isso nao e erro do app mobile; e apenas o navegador tentando abrir um endereco local que nao existe no aparelho.
+
+Para desenvolvimento, ha duas opcoes:
+
+1. Desligar temporariamente a confirmacao de e-mail em **Authentication > Providers > Email > Confirm email**. Assim o cadastro ja cria sessao no app e o aluno segue para o codigo da paroquia.
+2. Manter confirmacao ligada e configurar uma URL real em **Site URL** e **Redirect URLs**. Em app publicado, use deep link/universal link do app. No prototipo, depois que o aluno clicar no e-mail e confirmar, ele pode voltar manualmente ao app e fazer login.
+
+Para apresentacao do projeto integrador, a opcao mais simples costuma ser desligar a confirmacao de e-mail durante os testes.

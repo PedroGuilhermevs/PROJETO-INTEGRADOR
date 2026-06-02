@@ -21,8 +21,10 @@ export default function RegisterScreen({ navigation }) {
 
   async function handleRegister() {
     setError('');
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
-    if (!name.trim() || !email.trim() || !password) {
+    if (!cleanName || !cleanEmail || !password) {
       setError('Preencha nome, e-mail e senha.');
       return;
     }
@@ -40,11 +42,11 @@ export default function RegisterScreen({ navigation }) {
     setLoading(true);
 
     const { data, error: signUpError } = await supabase.auth.signUp({
-      email: email.trim(),
+      email: cleanEmail,
       password,
       options: {
         data: {
-          nome: name.trim(),
+          nome: cleanName,
           tipo_usuario: 'aluno',
         },
       },
@@ -60,8 +62,8 @@ export default function RegisterScreen({ navigation }) {
     if (!userId) {
       setLoading(false);
       Alert.alert(
-        'E-mail ja cadastrado',
-        'Esse e-mail provavelmente ja existe no Supabase Auth. Tente fazer login ou apague esse usuario em Authentication > Users para cadastrar novamente.'
+        'Conta ja existente',
+        'Esse e-mail ja possui cadastro ou esta aguardando confirmacao. Verifique sua caixa de entrada ou tente fazer login.'
       );
       navigation.navigate('Login');
       return;
@@ -70,8 +72,8 @@ export default function RegisterScreen({ navigation }) {
     if (!data.session) {
       setLoading(false);
       Alert.alert(
-        'Cadastro criado',
-        'Confirme seu e-mail no Supabase/Auth antes de entrar. Depois faca login no app.'
+        'Confirme seu e-mail',
+        'Enviamos um link de confirmacao para seu e-mail. Depois de confirmar, volte ao app e faca login para informar o codigo da paroquia.'
       );
       navigation.navigate('Login');
       return;

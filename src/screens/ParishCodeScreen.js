@@ -36,6 +36,7 @@ export default function ParishCodeScreen() {
       .from('paroquias')
       .select('id, nome, cidade, codigo_acesso, status')
       .eq('codigo_acesso', cleanCode)
+      .eq('status', 'ativa')
       .maybeSingle();
 
     if (parishError) {
@@ -45,29 +46,44 @@ export default function ParishCodeScreen() {
     }
 
     if (!parish) {
-      setError('Codigo de paroquia invalido.');
+      setError('Codigo de paroquia invalido ou inativo.');
       setLoading(false);
       return;
     }
 
-    if (parish.status && parish.status !== 'ativa') {
-      setError('Esta paroquia nao esta ativa no momento.');
-      setLoading(false);
-      return;
-    }
-
-    const { error: updateError } = await supabase.from('usuarios').upsert({
-      id: user.id,
+    const payload = {
       nome: profile?.nome || user.user_metadata?.nome || user.email,
       email: profile?.email || user.email,
       tipo_usuario: profile?.tipo_usuario || 'aluno',
       paroquia_id: parish.id,
-    });
+    };
+
+    const { data: updatedUser, error: updateError } = await supabase
+      .from('usuarios')
+      .update(payload)
+      .eq('id', user.id)
+      .select('*, paroquias(nome, cidade, codigo_acesso, status)')
+      .maybeSingle();
 
     if (updateError) {
       setError(getFriendlyAuthError(updateError));
       setLoading(false);
       return;
+    }
+
+    if (!updatedUser) {
+      const { error: upsertError } = await supabase
+        .from('usuarios')
+        .upsert({
+          id: user.id,
+          ...payload,
+        });
+
+      if (upsertError) {
+        setError(getFriendlyAuthError(upsertError));
+        setLoading(false);
+        return;
+      }
     }
 
     await refreshProfile(user.id);
