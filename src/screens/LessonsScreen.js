@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   Dimensions,
 } from 'react-native';
 
@@ -15,18 +14,10 @@ import { lessons } from '../data/mockData';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Proporção original da imagem trail-bg.png (largura x altura)
-// A imagem tem proporção aproximada de 1:2.5 (retrato alongado)
-const BG_IMAGE_RATIO = 2.5;
-const BG_TILE_HEIGHT = SCREEN_WIDTH * BG_IMAGE_RATIO;
-
 const ROW_HEIGHT = 260;
 const HEADER_HEIGHT = 230;
 const REWARD_HEIGHT = 130;
 const TOTAL_CONTENT_HEIGHT = HEADER_HEIGHT + lessons.length * ROW_HEIGHT + REWARD_HEIGHT;
-
-// Quantos tiles de background são necessários para cobrir todo o conteúdo
-const TILE_COUNT = Math.ceil(TOTAL_CONTENT_HEIGHT / BG_TILE_HEIGHT) + 1;
 
 export default function LessonsScreen({ navigation }) {
   return (
@@ -39,20 +30,11 @@ export default function LessonsScreen({ navigation }) {
       <View style={{ width: SCREEN_WIDTH, minHeight: TOTAL_CONTENT_HEIGHT }}>
 
         {/* Background em tiles repetidos verticalmente */}
-        <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-          {Array.from({ length: TILE_COUNT }).map((_, i) => (
-            <Image
-              key={i}
-              source={require('../assets/trail-bg.png')}
-              style={{
-                width: SCREEN_WIDTH,
-                height: BG_TILE_HEIGHT,
-                top: i * BG_TILE_HEIGHT,
-                position: 'absolute',
-              }}
-              resizeMode="cover"
-            />
-          ))}
+        <View style={styles.background} pointerEvents="none">
+          <View style={styles.sunGlow} />
+          <View style={styles.pathRibbon} />
+          <View style={[styles.hill, styles.hillBack]} />
+          <View style={[styles.hill, styles.hillFront]} />
         </View>
 
         {/* Conteúdo da tela por cima do background */}
@@ -98,6 +80,55 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingBottom: 40,
+  },
+
+  background: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#C5D9A8',
+    overflow: 'hidden',
+  },
+
+  sunGlow: {
+    position: 'absolute',
+    top: 36,
+    right: -44,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: '#F4DF8A',
+    opacity: 0.28,
+  },
+
+  pathRibbon: {
+    position: 'absolute',
+    left: SCREEN_WIDTH * 0.52 - 18,
+    top: HEADER_HEIGHT - 18,
+    width: 36,
+    height: TOTAL_CONTENT_HEIGHT - HEADER_HEIGHT + 40,
+    borderRadius: 30,
+    backgroundColor: '#E7D5B8',
+    opacity: 0.88,
+  },
+
+  hill: {
+    position: 'absolute',
+    width: SCREEN_WIDTH * 1.4,
+    height: 260,
+    borderRadius: 130,
+  },
+
+  hillBack: {
+    left: -SCREEN_WIDTH * 0.35,
+    top: HEADER_HEIGHT + 130,
+    backgroundColor: '#B5CF90',
+    opacity: 0.55,
+  },
+
+  hillFront: {
+    right: -SCREEN_WIDTH * 0.45,
+    top: HEADER_HEIGHT + 480,
+    backgroundColor: '#9FC47A',
+    opacity: 0.36,
   },
 
   trailContainer: {
