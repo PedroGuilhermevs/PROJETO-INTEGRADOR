@@ -3,6 +3,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  Image,
   Dimensions,
 } from 'react-native';
 
@@ -18,6 +19,9 @@ const ROW_HEIGHT = 260;
 const HEADER_HEIGHT = 230;
 const REWARD_HEIGHT = 130;
 const TOTAL_CONTENT_HEIGHT = HEADER_HEIGHT + lessons.length * ROW_HEIGHT + REWARD_HEIGHT;
+const BG_IMAGE_RATIO = 2.5;
+const BG_TILE_HEIGHT = SCREEN_WIDTH * BG_IMAGE_RATIO;
+const TILE_COUNT = Math.ceil(TOTAL_CONTENT_HEIGHT / BG_TILE_HEIGHT) + 1;
 
 export default function LessonsScreen({ navigation }) {
   return (
@@ -31,6 +35,14 @@ export default function LessonsScreen({ navigation }) {
 
         {/* Background em tiles repetidos verticalmente */}
         <View style={styles.background} pointerEvents="none">
+          {Array.from({ length: TILE_COUNT }).map((_, index) => (
+            <Image
+              key={`trail-bg-${index}`}
+              source={require('../assets/trail-bg.png')}
+              style={[styles.backgroundTile, { top: index * BG_TILE_HEIGHT }]}
+              resizeMode="cover"
+            />
+          ))}
           <View style={styles.sunGlow} />
           <View style={styles.pathRibbon} />
           <View style={[styles.hill, styles.hillBack]} />
@@ -86,6 +98,13 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: '#C5D9A8',
     overflow: 'hidden',
+  },
+
+  backgroundTile: {
+    position: 'absolute',
+    width: SCREEN_WIDTH,
+    height: BG_TILE_HEIGHT,
+    opacity: 0.75,
   },
 
   sunGlow: {
