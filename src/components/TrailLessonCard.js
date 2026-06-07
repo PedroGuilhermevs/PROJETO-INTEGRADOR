@@ -11,10 +11,10 @@ import { Check, Lock, BookOpen } from 'lucide-react-native';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const NODE_SIZE = 62;
-const CARD_WIDTH = SCREEN_WIDTH * 0.43;
-const NODE_LEFT = SCREEN_WIDTH * 0.52 - NODE_SIZE / 2;
+const NODE_LEFT = SCREEN_WIDTH * 0.5 - NODE_SIZE / 2;
 const GAP = 10;
 const ROW_HEIGHT = 190;
+const CARD_WIDTH = Math.min(168, SCREEN_WIDTH / 2 - NODE_SIZE / 2 - GAP);
 
 export default function TrailLessonCard({ lesson, index, onPress }) {
   const cardOnLeft = index % 2 === 0;
